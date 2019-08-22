@@ -177,21 +177,36 @@ function sendSMSCode() {
     }
 
     // TODO 发送短信验证码
-    $.get('/user/sms_code',{
-        'mobile':mobile,
-        'imagecode':imageCode,
+    $.get('/user/sms_code', {
+        'mobile': mobile,
+        'img_code':imageCode
     },function (data) {
-        if(data.result==1){
-            alert('请填写完整数据');
-        }else if(data.result==2 || data.result==4){
-            alert('图形验证码错误');
+        if (data.result == 1){
+            alert("手机号,图形验证码均不能为空");
+        }else if (data.result == 2){
+            alert("请获取短信验证码");
+        }else if (data.result == 3){
+            alert("图形验证码不正确");
+            //添加发送短信验证码的点击功能
             $(".get_code").attr("onclick", "sendSMSCode();");
             generateImageCode();
             $("#imagecode").val('');
-        }else if(data.result==3){
-            alert('请查看手机');
+        }else if (data.result == 4){
+            alert("短信验证码发送成功,请查看手机");
         }
     });
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 // 调用该函数模拟点击左侧按钮
