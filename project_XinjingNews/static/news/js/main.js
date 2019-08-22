@@ -142,42 +142,19 @@ $(function(){
         }
 
         // 发起注册请求
-        $.post("/user/register",{
-            "mobile":mobile,
-            "smscode":smscode,
-            "password":password,
-            "csrf_token":$("#csrf_token").val()
 
-        },function (data) {
-            if (data.result==1){
-                alert("请将数据填写完整");
-            }else if (data.result==2){
-                alert("请先获取短信验证码");
-            }else if (data.result==3){
-                alert("短信验证码错误");
-            }else if (data.result==4){
-                alert("此手机号已经存在");
-            }else if (data.result==5){
-                alert("密码长度为6-20，且只能包含数字和字母");
-            }else if (data.result==6){
-                //成功
-                $(".login_form_con").show();
-                $(".register_form_con").hide();
-            }
-
-        });
 
     })
 })
 
-var imageCodeId = "";
+var imageCodeId = ""
 
 // TODO 生成一个图片验证码的编号，并设置页面中图片验证码img标签的src属性
 function generateImageCode() {
-    // 缓存：当浏览器发现请求地址不变时，会使用之前缓存的数据，而不是重新发请求
-    // 如果地址相同，但是参数不同时，浏览器不会使用缓存
-    // Math.random()===> js中产生随机数
-    $(".get_pic_code").attr("src","/user/image_code?a=" + Math.random());
+    //缓存：当浏览器发现请求地址不变时，会使用之前缓存的数据，而不再重新发请求
+    //如果地址相同，但是参数不同时，浏览器不会使用缓存
+    //Math.random()==>js中产生随机数
+    $(".get_pic_code").attr("src", "/user/image_code?a=" + Math.random());
 }
 
 // 发送短信验证码
@@ -200,19 +177,19 @@ function sendSMSCode() {
     }
 
     // TODO 发送短信验证码
-    $.get("/user/sms_code",{
-        "mobile":mobile,
-        "imagecode":imageCode,
+    $.get('/user/sms_code',{
+        'mobile':mobile,
+        'imagecode':imageCode,
     },function (data) {
         if(data.result==1){
-            alert("请填写完整数据");
+            alert('请填写完整数据');
         }else if(data.result==2 || data.result==4){
-            alert("图形验证码错误");
+            alert('图形验证码错误');
             $(".get_code").attr("onclick", "sendSMSCode();");
             generateImageCode();
-            $("#imagecode").val("");
+            $("#imagecode").val('');
         }else if(data.result==3){
-            alert("请查看手机");
+            alert('请查看手机');
         }
     });
 }
