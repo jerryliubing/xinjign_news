@@ -108,18 +108,18 @@ $(function(){
         }
 
         // 发起登录请求
-    })
+    });
 
 
     // TODO 注册按钮点击
     $(".register_form_con").submit(function (e) {
         // 阻止默认提交操作
-        e.preventDefault()
+        e.preventDefault();
 
 		// 取到用户输入的内容
-        var mobile = $("#register_mobile").val()
-        var smscode = $("#smscode").val()
-        var password = $("#register_password").val()
+        var mobile = $("#register_mobile").val();
+        var smscode = $("#smscode").val();
+        var password = $("#register_password").val();
 
 		if (!mobile) {
             $("#register-mobile-err").show();
@@ -142,12 +142,29 @@ $(function(){
         }
 
         // 发起注册请求
-
-
+        $.post("/user/register", {
+            'mobile': mobile,
+            'password': password,
+            'smscode': smscode,
+            'csrf_token': $("#csrf_token").val()
+        }, function (data) {
+            if (data.result == 1){
+                alert("注册信息不全");
+            } else if (data.result == 2){
+                alert("短信验证码错误");
+            } else if (data.result == 3){
+                alert("密码不合规");
+            } else if (data.result == 4){
+                alert("该手机号已经注册");
+            } else if (data.result == 5){
+                $(".register_form_con").hide();
+                $(".login_form_con").show();
+            }
+        });
     })
-})
+});
 
-var imageCodeId = ""
+var imageCodeId = "";
 
 // TODO 生成一个图片验证码的编号，并设置页面中图片验证码img标签的src属性
 function generateImageCode() {
