@@ -120,9 +120,13 @@ def login():
         return jsonify(result=3)                    # 3 --> 密码错误
 
 
-
-
-
+# 退出视图
+@user_blueprint.route("/logout")
+def logout():
+    # 退出就是删除登录成功的标记
+    if 'user_id' in session:
+        del session["use_id"]
+    return jsonify(result=1)                        # 1 --> 退出成功
 
 
 

@@ -281,3 +281,16 @@ function generateUUID() {
     });
     return uuid;
 }
+
+function logout() {
+    $.get('/user/logout', function (data) {
+        if (data.result == 1){
+            $(".user_btns").show();
+            $(".user_login").hide();
+        }
+
+    })
+}
+
+
+
