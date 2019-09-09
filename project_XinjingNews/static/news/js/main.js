@@ -93,9 +93,9 @@ $(function(){
 
     // TODO 登录表单提交
     $(".login_form_con").submit(function (e) {
-        e.preventDefault()
-        var mobile = $(".login_form #mobile").val()
-        var password = $(".login_form #password").val()
+        e.preventDefault();
+        var mobile = $(".login_form #mobile").val();
+        var password = $(".login_form #password").val();
 
         if (!mobile) {
             $("#login-mobile-err").show();
@@ -108,6 +108,27 @@ $(function(){
         }
 
         // 发起登录请求
+        $.post('/user/login', {
+            "mobile": mobile,
+            "password": password,
+            "csrf_token": $("#csrf_token").val()
+        }, function (data) {
+            if (data.result == 1){
+                alert("手机号,密码输入不全")
+            } else if (data.result == 2){
+                alert("手机号未注册")
+            } else if (data.result == 3){
+                alert("密码错误")
+            } else if (data.result == 4){
+                $(".login_form_con").hide();
+                $(".user_btns").hide();
+                $(".user_login").show();
+                // 显示头像
+                $(".lgin_pic").attr("src", "/static/news/images/" + data.avatar);
+                // 显示昵称
+                $("#nick_name").html(data.nick_name);
+            }
+        })
     });
 
 

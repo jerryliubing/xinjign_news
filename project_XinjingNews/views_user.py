@@ -97,7 +97,27 @@ def register():
     return jsonify(result=5)                        # 5 --> 注册成功
 
 
-
+# 登录视图
+@user_blueprint.route("/login", methods=["POST"])
+def login():
+    # 接收
+    mobile = request.form.get("mobile")
+    password = request.form.get("password")
+    # 验证
+    if not all([mobile, password]):
+        return jsonify(result=1)                    # 1 --> 手机号,密码输入不全
+    # 处理
+    user = UserInfo.query.filter_by(mobile=mobile).first()
+    if not user:
+        return jsonify(result=2)                    # 2 --> 手机号未注册
+    if user.check_pwd(password):
+        # 密码正确
+        # 登录状态保持,记录登录成功
+        session["use_id"] = user.id
+        return jsonify(result=4, nick_name=user.nick_name, avatar=user.avatar)  # 4 --> 登录成功
+    else:
+        # 密码错误
+        return jsonify(result=3)                    # 3 --> 密码错误
 
 
 
