@@ -149,9 +149,36 @@ def index():
     )
 
 
+# 修改用户基本资料
+@user_blueprint.route("/base", methods=["GET", "POST"])
+def base():
+    # 验证用户是否登录
+    if "user_id" not in session:
+        return redirect('/')    # 用户未登录,返回登录页面
+    g.user = UserInfo.query.get(session.get("user_id"))
 
+    # get请求展示基本信息页
+    if request.method == "GET":
+        return render_template("/news/user_base_info.html")
+    # post请求修改:签名,昵称,性别
+    # 接收
+    signature = request.form.get("signature")
+    nick_name = request.form.get("nick_name")
+    gender = request.form.get("gender")     # "0", "1"
+    # 验证
+    if not all([signature, nick_name, gender]):
+        return jsonify(result=1)                    # 1 --> 信息填写不完整
 
+    # 处理
+    user = g.user
+    user.signature = signature
+    user.nick_name = nick_name
+    user.gender = bool(int(gender))
 
+    db.session.commit()
+
+    # 响应
+    return jsonify(result=2)                        # 2 --> 修改信息成功
 
 
 
