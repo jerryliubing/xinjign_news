@@ -1,6 +1,6 @@
 import re
 
-from flask import Blueprint, render_template, session, make_response, request, jsonify
+from flask import Blueprint, render_template, session, make_response, request, jsonify, redirect, g
 from models import UserInfo, db
 from utils.captcha.captcha import captcha
 from utils.ytx_sdk.ytx_send import sendTemplateSMS
@@ -113,7 +113,7 @@ def login():
     if user.check_pwd(password):
         # 密码正确
         # 登录状态保持,记录登录成功
-        session["use_id"] = user.id
+        session["user_id"] = user.id
         return jsonify(result=4, nick_name=user.nick_name, avatar=user.avatar)  # 4 --> 登录成功
     else:
         # 密码错误
@@ -125,10 +125,28 @@ def login():
 def logout():
     # 退出就是删除登录成功的标记
     if 'user_id' in session:
-        del session["use_id"]
+        del session["user_id"]
     return jsonify(result=1)                        # 1 --> 退出成功
 
 
+# 用户中心--显示用户中心首页
+@user_blueprint.route("/")
+def index():
+    # 验证是否已经登录
+    if "user_id" not in session:
+        print(123)
+        print(session.get("user_id"))
+        print(456)
+        return redirect("/")  # 用户没有登录则重定向到用户中心首页
+    # 查询当前登录用户
+    user_id = session.get("user_id")
+    print(user_id)
+    g.user = UserInfo.query.get(user_id)  # g变量属性赋值,直接在模板中访问
+
+    return render_template(
+        "news/user.html",
+        title="用户中心"
+    )
 
 
 
