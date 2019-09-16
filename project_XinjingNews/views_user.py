@@ -5,8 +5,27 @@ from models import UserInfo, db
 from utils.captcha.captcha import captcha
 from utils.ytx_sdk.ytx_send import sendTemplateSMS
 import random
+import functools
 
 user_blueprint = Blueprint("user", __name__, url_prefix="/user")
+
+
+# 登录验证装饰器
+def login_valid(view_fun):
+    # 输出原有函数名称,不用fun取代原有函数名称
+    @functools.wraps(view_fun)
+    def fun(*args, **kwargs):
+        # 验证用户是否已登录
+        if "user_id" not in session:
+            return redirect('/')
+
+        # 根据用户id查询用户
+        g.user = UserInfo.query.get(session.get('user_id'))
+        # 执行视图函数
+        # 将视图函数的响应内容返回给客户端
+        return view_fun(*args, **kwargs)
+
+    return fun
 
 
 # 图片验证码
@@ -131,17 +150,15 @@ def logout():
 
 # 用户中心--显示用户中心首页
 @user_blueprint.route("/")
+@login_valid
 def index():
-    # 验证是否已经登录
-    if "user_id" not in session:
-        print(123)
-        print(session.get("user_id"))
-        print(456)
-        return redirect("/")  # 用户没有登录则重定向到用户中心首页
-    # 查询当前登录用户
-    user_id = session.get("user_id")
-    print(user_id)
-    g.user = UserInfo.query.get(user_id)  # g变量属性赋值,直接在模板中访问
+    # # 验证是否已经登录
+    # if "user_id" not in session:
+    #     return redirect("/")  # 用户没有登录则重定向到用户中心首页
+    # # 查询当前登录用户
+    # user_id = session.get("user_id")
+    # print(user_id)
+    # g.user = UserInfo.query.get(user_id)  # g变量属性赋值,直接在模板中访问
 
     return render_template(
         "news/user.html",
