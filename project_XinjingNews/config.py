@@ -24,6 +24,12 @@ class Config(object):
     # os.path.dirname('')==>获取目录名，如/home/python/Desktop/sy8/sy8_flask/xjzx
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
+    # 文件保存路径
+    UPLOAD_FILES_PATH = os.path.join(BASE_DIR, 'static/avatars/')
+
+    # 七牛云网址
+    QINIU_URL = "http://py98egkjc.bkt.clouddn.com/"
+
 
 class DevelopConfig(Config):
     DEBUG = True

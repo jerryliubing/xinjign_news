@@ -1,7 +1,8 @@
-from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy, current_app
 from datetime import datetime
 
 from werkzeug.security import generate_password_hash, check_password_hash
+
 
 db = SQLAlchemy()
 
@@ -147,6 +148,11 @@ class UserInfo(db.Model, BaseModel):
     # 对比密码
     def check_pwd(self, pwd):
         return check_password_hash(self.password_hash, pwd)
+
+    # 拼接七牛网址
+    @property
+    def avatar_url(self):
+        return current_app.config.get("QINIU_URL") + self.avatar
 
 
 # 评论表

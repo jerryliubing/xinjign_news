@@ -1,8 +1,9 @@
 import re
 
-from flask import Blueprint, render_template, session, make_response, request, jsonify, redirect, g
+from flask import Blueprint, render_template, session, make_response, request, jsonify, redirect, g, current_app
 from models import UserInfo, db
 from utils.captcha.captcha import captcha
+from utils import qiniu_upload
 from utils.ytx_sdk.ytx_send import sendTemplateSMS
 import random
 import functools
@@ -133,7 +134,7 @@ def login():
         # 密码正确
         # 登录状态保持,记录登录成功
         session["user_id"] = user.id
-        return jsonify(result=4, nick_name=user.nick_name, avatar=user.avatar)  # 4 --> 登录成功
+        return jsonify(result=4, nick_name=user.nick_name, avatar=user.avatar_url)  # 4 --> 登录成功
     else:
         # 密码错误
         return jsonify(result=3)                    # 3 --> 密码错误
@@ -168,11 +169,12 @@ def index():
 
 # 修改用户基本资料
 @user_blueprint.route("/base", methods=["GET", "POST"])
+@login_valid
 def base():
-    # 验证用户是否登录
-    if "user_id" not in session:
-        return redirect('/')    # 用户未登录,返回登录页面
-    g.user = UserInfo.query.get(session.get("user_id"))
+    # # 验证用户是否登录
+    # if "user_id" not in session:
+    #     return redirect('/')    # 用户未登录,返回登录页面
+    # g.user = UserInfo.query.get(session.get("user_id"))
 
     # get请求展示基本信息页
     if request.method == "GET":
@@ -196,6 +198,32 @@ def base():
 
     # 响应
     return jsonify(result=2)                        # 2 --> 修改信息成功
+
+
+# 头像上传
+@user_blueprint.route('/pic', methods=["GET", "POST"])
+@login_valid
+def pic():
+    if request.method == "GET":
+        return render_template("/news/user_pic_info.html")
+    # post请求,接收文件并保存,修改头像属性并保存,返回新头像名称
+    # 接收文件
+    avatar = request.files.get("avatar")    # 文件对象
+    # 保存文件
+    # 实际情况下，文件被保存到单独的服务器：第三方文件服务器，自己搭建的服务器
+    # avatar.save(current_app.config.get("UPLOAD_FILES_PATH") + avatar.filename)
+    avatar_name = qiniu_upload.upload(avatar)
+
+    # 修改对象的头像属性
+    user = g.user
+    user.avatar = avatar_name
+    db.session.commit()
+
+    return jsonify(avatar=user.avatar_url)
+
+
+
+
 
 
 

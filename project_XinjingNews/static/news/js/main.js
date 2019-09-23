@@ -89,7 +89,7 @@ $(function(){
 		}
 		$(this).addClass('active').siblings().removeClass('active');
 
-	})
+	});
 
     // TODO 登录表单提交
     $(".login_form_con").submit(function (e) {
@@ -124,7 +124,7 @@ $(function(){
                 $(".user_btns").hide();
                 $(".user_login").show();
                 // 显示头像
-                $(".lgin_pic").attr("src", "/static/news/images/" + data.avatar);
+                $(".lgin_pic").attr("src", data.avatar);
                 // 显示昵称
                 $("#nick_name").html(data.nick_name);
             }

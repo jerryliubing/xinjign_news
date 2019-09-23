@@ -19,7 +19,7 @@
             </div>
             <!-- 用户登录后显示下面，隐藏上面 -->
             <div class="user_login fr" {% if g.user %}style="display: block;" {% endif %}>
-                <img src="/static/news/images/{{ g.user.avatar }}" class="lgin_pic">
+                <img src="{{ g.user.avatar_url }}" class="lgin_pic">
                 <a href="#" id="nick_name">{{ g.user.nick_name }}</a>
                 <a href="javascript:logout();">退出</a>
             </div>
